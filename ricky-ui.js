@@ -190,7 +190,54 @@
     </div>
   `);
 
-  createTabContent('content2', 'Features Tab Content');
+  createTabContent('content2', `
+    <div style="height: 100%; padding: 20px;">
+      <div class="dropdown-container" style="
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        width: 100%;
+        text-align: center;
+        margin-top: 40px;">
+        
+        <!-- Websites Dropdown -->
+        <div class="custom-dropdown">
+          <button class="dropdown-btn">Websites 🌐</button>
+          <div class="dropdown-content">
+            <a href="https://chat.openai.com" target="_blank">ChatGPT</a>
+            <a href="https://github.com" target="_blank">GitHub</a>
+            <a href="https://youtube.com" target="_blank">YouTube</a>
+            <a href="https://discord.com" target="_blank">Discord</a>
+            <a href="https://twitter.com" target="_blank">Twitter</a>
+          </div>
+        </div>
+
+        <!-- Games Dropdown -->
+        <div class="custom-dropdown">
+          <button class="dropdown-btn">Games 🎮</button>
+          <div class="dropdown-content">
+            <a href="https://krunker.io" target="_blank">Krunker.io</a>
+            <a href="https://slither.io" target="_blank">Slither.io</a>
+            <a href="https://shellshock.io" target="_blank">ShellShock.io</a>
+            <a href="https://1v1.lol" target="_blank">1v1.lol</a>
+            <a href="https://minecraft.net" target="_blank">Minecraft</a>
+          </div>
+        </div>
+
+        <!-- UI Themes Dropdown -->
+        <div class="custom-dropdown">
+          <button class="dropdown-btn">UI Themes 🎨</button>
+          <div class="dropdown-content">
+            <a href="#" onclick="setTheme('neon')">Neon Theme</a>
+            <a href="#" onclick="setTheme('dark')">Dark Theme</a>
+            <a href="#" onclick="setTheme('cyber')">Cyber Theme</a>
+            <a href="#" onclick="setTheme('retro')">Retro Theme</a>
+            <a href="#" onclick="setTheme('minimal')">Minimal Theme</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `);
 
   createTabContent('content3', '');
   const content3 = document.getElementById('content3');
@@ -254,6 +301,7 @@
 
       bookmarkElement.innerHTML = `
         <a href="${bookmark.url}" target="_blank" style="color: white; text-decoration: none;">${bookmark.title}</a>
+        <button onclick="deleteBookmark(${index})" style
         <button onclick="deleteBookmark(${index})" style="padding: 5px 10px; background: #f44336; color: white; border: none; cursor: pointer;">Delete</button>
       `;
       bookmarkList.appendChild(bookmarkElement);
@@ -320,6 +368,107 @@
     rgbContainer.style.height = rgbContainer.style.height === '30px' ? '400px' : '30px';
   });
   rgbContainer.appendChild(minimizeButton);
+
+  // Add the dropdown styles
+  const dropdownStyles = document.createElement('style');
+  dropdownStyles.textContent = `
+    .custom-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-btn {
+      background: linear-gradient(45deg, #2b2b2b, #1a1a1a);
+      color: #fff;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(0,255,0,0.2);
+      width: 80%;
+    }
+
+    .dropdown-btn:hover {
+      background: linear-gradient(45deg, #3b3b3b, #2a2a2a);
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(0,255,0,0.4);
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: rgba(20, 20, 20, 0.95);
+      min-width: 160px;
+      box-shadow: 0 0 15px rgba(0,255,0,0.3);
+      border-radius: 8px;
+      padding: 8px 0;
+      z-index: 1;
+      backdrop-filter: blur(5px);
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .custom-dropdown:hover .dropdown-content {
+      display: block;
+      animation: dropdownFade 0.3s ease;
+    }
+
+    .dropdown-content a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      transition: all 0.2s ease;
+    }
+
+    .dropdown-content a:hover {
+      background: rgba(0,255,0,0.1);
+      padding-left: 22px;
+    }
+
+    @keyframes dropdownFade {
+      from {
+        opacity: 0;
+        transform: translateY(20px) translateX(-50%);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) translateX(-50%);
+      }
+    }
+  `;
+  document.head.appendChild(dropdownStyles);
+
+  // Theme switching functionality
+  window.setTheme = (theme) => {
+    const container = document.getElementById('rgbContainer');
+    switch(theme) {
+      case 'neon':
+        container.style.background = 'linear-gradient(45deg, #000000, #1a1a1a)';
+        container.style.boxShadow = '0 0 20px #00ff00';
+        break;
+      case 'dark':
+        container.style.background = 'linear-gradient(45deg, #1a1a1a, #2d2d2d)';
+        container.style.boxShadow = '0 0 20px rgba(255,255,255,0.2)';
+        break;
+      case 'cyber':
+        container.style.background = 'linear-gradient(45deg, #000428, #004e92)';
+        container.style.boxShadow = '0 0 20px #00ffff';
+        break;
+      case 'retro':
+        container.style.background = 'linear-gradient(45deg, #2b0537, #760a5e)';
+        container.style.boxShadow = '0 0 20px #ff00ff';
+        break;
+      case 'minimal':
+        container.style.background = '#1a1a1a';
+        container.style.boxShadow = '0 0 10px rgba(255,255,255,0.1)';
+        break;
+    }
+  };
 
   document.querySelector('[data-content="content1"]').click();
 })();
