@@ -71,7 +71,8 @@
             { title: 'YouTube', url: 'https://youtube.com' },
             { title: 'Discord', url: 'https://discord.com' },
             { title: 'Twitter', url: 'https://twitter.com' },
-            { title: 'Pinterest', url: 'https://www.pinterest.com' }
+            { title: 'Pinterest', url: 'https://www.pinterest.com' },
+            { title: 'Spotify', url: 'https://open.spotify.com' } // New addition
           ]
         },
         {
@@ -80,7 +81,6 @@
             { title: 'Slither.io', url: 'https://slither.io' },
             { title: 'Skribbl.io', url: 'https://skribbl.io/' },
             { title: 'Drive Mad', url: 'https://poki.com/en/g/drive-mad?msockid=3870dedb96f7653e3fa8cab1974d6494' }
-            // You can add more games later
           ]
         },
         {
