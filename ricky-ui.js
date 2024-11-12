@@ -1,6 +1,72 @@
 (function() {
   if (document.querySelector('#rgbContainer')) return;
 
+  // Configuration Objects
+  const config = {
+    tabs: [
+      { label: 'Home', contentId: 'content1' },
+      { label: 'Features', contentId: 'content2' },
+      { label: 'Chat', contentId: 'content3' },
+      { label: 'AI', contentId: 'content4' },
+      { label: 'Bookmarks', contentId: 'content5' }
+    ],
+    dropdowns: [
+      {
+        label: 'Websites 🌐',
+        items: [
+          { title: 'ChatGPT', url: 'https://chat.openai.com' },
+          { title: 'GitHub', url: 'https://github.com' },
+          { title: 'YouTube', url: 'https://youtube.com' },
+          { title: 'Discord', url: 'https://discord.com' },
+          { title: 'Twitter', url: 'https://twitter.com' },
+          { title: 'Pinterest', url: 'https://www.pinterest.com' }
+        ]
+      },
+      {
+        label: 'Games 🎮',
+        items: [
+          { title: 'Slither.io', url: 'https://slither.io' },
+          { title: 'Skribbl.io', url: 'https://skribbl.io/' },
+          { title: 'Drive Mad', url: 'https://poki.com/en/g/drive-mad?msockid=3870dedb96f7653e3fa8cab1974d6494' }
+          // You can add more games later
+        ]
+      },
+      {
+        label: 'UI Themes 🎨',
+        items: [
+          { title: 'Neon Theme', theme: 'neon' },
+          { title: 'Dark Theme', theme: 'dark' },
+          { title: 'Cyber Theme', theme: 'cyber' },
+          { title: 'Retro Theme', theme: 'retro' },
+          { title: 'Minimal Theme', theme: 'minimal' }
+        ]
+      }
+    ],
+    themes: {
+      neon: {
+        background: 'linear-gradient(45deg, #000000, #1a1a1a)',
+        boxShadow: '0 0 20px #00ff00'
+      },
+      dark: {
+        background: 'linear-gradient(45deg, #1a1a1a, #2d2d2d)',
+        boxShadow: '0 0 20px rgba(255,255,255,0.2)'
+      },
+      cyber: {
+        background: 'linear-gradient(45deg, #000428, #004e92)',
+        boxShadow: '0 0 20px #00ffff'
+      },
+      retro: {
+        background: 'linear-gradient(45deg, #2b0537, #760a5e)',
+        boxShadow: '0 0 20px #ff00ff'
+      },
+      minimal: {
+        background: '#1a1a1a',
+        boxShadow: '0 0 10px rgba(255,255,255,0.1)'
+      }
+    }
+  };
+
+  // Stylesheet Injection
   const styleSheet = document.createElement('style');
   styleSheet.textContent = `
     @keyframes float {
@@ -38,37 +104,56 @@
       transform: scale(1.1);
       box-shadow: 0 0 25px rgba(255,255,255,0.8);
     }
+    /* Responsive Styles */
+    @media (max-width: 600px) {
+      #rgbContainer {
+        width: 90%;
+        height: 90%;
+      }
+      .dropdown-btn {
+        font-size: 14px;
+      }
+    }
   `;
   document.head.appendChild(styleSheet);
 
+  // Create Container
   const rgbContainer = document.createElement('div');
   rgbContainer.id = 'rgbContainer';
-  rgbContainer.style.position = 'fixed';
-  rgbContainer.style.top = '50%';
-  rgbContainer.style.left = '50%';
-  rgbContainer.style.transform = 'translate(-50%, -50%)';
-  rgbContainer.style.width = '500px';
-  rgbContainer.style.height = '400px';
-  rgbContainer.style.border = '2px solid white';
-  rgbContainer.style.borderRadius = '10px';
-  rgbContainer.style.padding = '10px';
-  rgbContainer.style.zIndex = '10000';
-  rgbContainer.style.background = 'linear-gradient(45deg, #000000, #1a1a1a)';
-  rgbContainer.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.5)';
-  rgbContainer.style.overflow = 'hidden';
+  Object.assign(rgbContainer.style, {
+    position: 'fixed',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '500px',
+    height: '400px',
+    border: '2px solid white',
+    borderRadius: '10px',
+    padding: '10px',
+    zIndex: '10000',
+    background: 'linear-gradient(45deg, #000000, #1a1a1a)',
+    boxShadow: '0 0 10px rgba(255, 255, 255, 0.5)',
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column'
+  });
   document.body.appendChild(rgbContainer);
 
+  // Drag-and-Drop Functionality
   let isDragging = false;
   let offsetX, offsetY;
 
   const topBar = document.createElement('div');
-  topBar.style.width = '100%';
-  topBar.style.height = '30px';
-  topBar.style.background = 'rgba(255, 255, 255, 0.1)';
-  topBar.style.display = 'flex';
-  topBar.style.alignItems = 'center';
-  topBar.style.justifyContent = 'center';
-  topBar.style.cursor = 'grab';
+  Object.assign(topBar.style, {
+    width: '100%',
+    height: '30px',
+    background: 'rgba(255, 255, 255, 0.1)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'grab',
+    position: 'relative'
+  });
   rgbContainer.appendChild(topBar);
 
   topBar.addEventListener('mousedown', (e) => {
@@ -78,65 +163,81 @@
     topBar.style.cursor = 'grabbing';
   });
 
-  document.addEventListener('mousemove', (e) => {
+  const onMouseMove = (e) => {
     if (!isDragging) return;
     rgbContainer.style.left = `${e.clientX - offsetX}px`;
     rgbContainer.style.top = `${e.clientY - offsetY}px`;
-  });
+  };
 
-  document.addEventListener('mouseup', () => {
+  const onMouseUp = () => {
     isDragging = false;
     topBar.style.cursor = 'grab';
-  });
+  };
 
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+
+  // Title
   const title = document.createElement('h2');
   title.innerText = "Phoenix Hub";
-  title.style.color = 'white';
-  title.style.margin = '0';
-  title.style.fontSize = '16px';
-  title.style.fontFamily = "'Press Start 2P', cursive";
-  title.style.animation = 'neonGlow 2s infinite';
+  Object.assign(title.style, {
+    color: 'white',
+    margin: '0',
+    fontSize: '16px',
+    fontFamily: "'Press Start 2P', cursive",
+    animation: 'neonGlow 2s infinite'
+  });
   topBar.appendChild(title);
 
+  // Particle Effects
   const particleContainer = document.createElement('div');
-  particleContainer.style.position = 'absolute';
-  particleContainer.style.top = '0';
-  particleContainer.style.left = '0';
-  particleContainer.style.width = '100%';
-  particleContainer.style.height = '100%';
-  particleContainer.style.pointerEvents = 'none';
+  Object.assign(particleContainer.style, {
+    position: 'absolute',
+    top: '0',
+    left: '0',
+    width: '100%',
+    height: '100%',
+    pointerEvents: 'none'
+  });
   rgbContainer.appendChild(particleContainer);
 
   for (let i = 0; i < 50; i++) {
     const particle = document.createElement('div');
-    particle.style.position = 'absolute';
-    particle.style.width = '2px';
-    particle.style.height = '2px';
-    particle.style.background = 'white';
-    particle.style.left = Math.random() * 100 + '%';
-    particle.style.top = Math.random() * 100 + '%';
-    particle.style.opacity = Math.random();
-    particle.style.animation = `particleFloat ${Math.random() * 3 + 2}s infinite`;
+    Object.assign(particle.style, {
+      position: 'absolute',
+      width: '2px',
+      height: '2px',
+      background: 'white',
+      left: Math.random() * 100 + '%',
+      top: Math.random() * 100 + '%',
+      opacity: Math.random(),
+      animation: `particleFloat ${Math.random() * 3 + 2}s infinite`
+    });
     particleContainer.appendChild(particle);
   }
 
+  // Tab Navigation
   const tabNav = document.createElement('div');
-  tabNav.style.display = 'flex';
-  tabNav.style.justifyContent = 'space-around';
-  tabNav.style.borderBottom = '2px solid white';
-  tabNav.style.marginTop = '10px';
-  tabNav.style.cursor = 'pointer';
+  Object.assign(tabNav.style, {
+    display: 'flex',
+    justifyContent: 'space-around',
+    borderBottom: '2px solid white',
+    marginTop: '10px',
+    cursor: 'pointer'
+  });
   rgbContainer.appendChild(tabNav);
 
-  function createTab(label, contentId) {
+  function createTab({ label, contentId }) {
     const tab = document.createElement('div');
     tab.innerText = label;
-    tab.style.padding = '10px';
-    tab.style.color = 'white';
-    tab.style.flex = '1';
-    tab.style.textAlign = 'center';
-    tab.style.transition = 'all 0.3s ease';
-    tab.style.borderBottom = '2px solid transparent';
+    Object.assign(tab.style, {
+      padding: '10px',
+      color: 'white',
+      flex: '1',
+      textAlign: 'center',
+      transition: 'all 0.3s ease',
+      borderBottom: '2px solid transparent'
+    });
     tab.classList.add('tab-hover');
     tab.dataset.content = contentId;
 
@@ -157,226 +258,329 @@
     return tab;
   }
 
-  tabNav.appendChild(createTab('Home', 'content1'));
-  tabNav.appendChild(createTab('Features', 'content2'));
-  tabNav.appendChild(createTab('Chat', 'content3'));
-  tabNav.appendChild(createTab('AI', 'content4'));
-  tabNav.appendChild(createTab('Bookmarks', 'content5'));
+  config.tabs.forEach((tabConfig) => {
+    tabNav.appendChild(createTab(tabConfig));
+  });
 
-  function createTabContent(id, text) {
+  // Content Areas
+  function createTabContent(id, builderFunction) {
     const content = document.createElement('div');
     content.id = id;
     content.className = 'tab-content';
-    content.style.color = 'white';
-    content.style.padding = '10px';
-    content.style.display = 'none';
-    content.style.textAlign = 'center';
-    content.style.fontSize = '24px';
-    content.style.fontFamily = '"Lucida Console", Monaco, monospace';
-    content.innerHTML = text;
+    Object.assign(content.style, {
+      color: 'white',
+      padding: '10px',
+      display: 'none',
+      textAlign: 'center',
+      flex: '1',
+      overflow: 'auto'
+    });
+    builderFunction(content);
     rgbContainer.appendChild(content);
     return content;
   }
 
-  createTabContent('content1', `
-    <div style="animation: float 3s infinite ease-in-out; margin-top: 40px;">
-      <span id="welcomeText" style="font-size: 28px; animation: neonGlow 2s infinite">Welcome to Phoenix Hub!</span>
-      <br><br><br>
-      <span style="font-size: 24px; animation: pulse 2s infinite">Made by Ricky</span>
-      <br><br><br>
-      <div style="position: absolute; bottom: 10px; width: 100%; left: 0; font-size: 14px; opacity: 0.8">
-        Last Updated: January 17, 2024
-      </div>
-    </div>
-  `);
-
-  createTabContent('content2', `
-    <div style="height: 100%; padding: 20px;">
-      <div class="dropdown-container" style="
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        width: 100%;
-        text-align: center;
-        margin-top: 40px;">
-        
-        <!-- Websites Dropdown -->
-        <div class="custom-dropdown">
-          <button class="dropdown-btn">Websites 🌐</button>
-          <div class="dropdown-content">
-            <a href="https://chat.openai.com" target="_blank">ChatGPT</a>
-            <a href="https://github.com" target="_blank">GitHub</a>
-            <a href="https://youtube.com" target="_blank">YouTube</a>
-            <a href="https://discord.com" target="_blank">Discord</a>
-            <a href="https://twitter.com" target="_blank">Twitter</a>
-          </div>
-        </div>
-
-        <!-- Games Dropdown -->
-        <div class="custom-dropdown">
-          <button class="dropdown-btn">Games 🎮</button>
-          <div class="dropdown-content">
-            <a href="https://krunker.io" target="_blank">Krunker.io</a>
-            <a href="https://slither.io" target="_blank">Slither.io</a>
-            <a href="https://shellshock.io" target="_blank">ShellShock.io</a>
-            <a href="https://1v1.lol" target="_blank">1v1.lol</a>
-            <a href="https://minecraft.net" target="_blank">Minecraft</a>
-          </div>
-        </div>
-
-        <!-- UI Themes Dropdown -->
-        <div class="custom-dropdown">
-          <button class="dropdown-btn">UI Themes 🎨</button>
-          <div class="dropdown-content">
-            <a href="#" onclick="setTheme('neon')">Neon Theme</a>
-            <a href="#" onclick="setTheme('dark')">Dark Theme</a>
-            <a href="#" onclick="setTheme('cyber')">Cyber Theme</a>
-            <a href="#" onclick="setTheme('retro')">Retro Theme</a>
-            <a href="#" onclick="setTheme('minimal')">Minimal Theme</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  `);
-
-  createTabContent('content3', '');
-  const content3 = document.getElementById('content3');
-  content3.style.overflow = 'auto';
-  content3.style.maxHeight = 'calc(100% - 40px)';
-  const iframe1 = document.createElement('iframe');
-  iframe1.src = "https://deadsimplechat.com/yNDNA0hhp";
-  iframe1.width = "100%";
-  iframe1.style.height = '600px';
-  iframe1.style.border = 'none';
-  content3.appendChild(iframe1);
-
-  createTabContent('content4', '');
-  const content4 = document.getElementById('content4');
-  content4.style.overflow = 'auto';
-  content4.style.maxHeight = 'calc(100% - 40px)';
-  const iframe2 = document.createElement('iframe');
-  iframe2.src = "https://www.blackbox.ai/";
-  iframe2.width = "100%";
-  iframe2.style.height = '600px';
-  iframe2.style.border = 'none';
-  content4.appendChild(iframe2);
-
-  createTabContent('content5', '');
-  const content5 = document.getElementById('content5');
-  content5.style.display = 'none';
-  content5.style.height = '100%';
-  content5.style.overflow = 'auto';
-
-  const bookmarkContainer = document.createElement('div');
-  bookmarkContainer.style.padding = '10px';
-  bookmarkContainer.style.height = '100%';
-  bookmarkContainer.style.display = 'flex';
-  bookmarkContainer.style.flexDirection = 'column';
-  bookmarkContainer.style.gap = '10px';
-
-  const bookmarkForm = document.createElement('form');
-  bookmarkForm.innerHTML = `
-    <input type="text" id="bookmarkTitle" placeholder="Title" style="margin-right: 5px; padding: 5px;">
-    <input type="url" id="bookmarkUrl" placeholder="URL" style="margin-right: 5px; padding: 5px;">
-    <button type="submit" style="padding: 5px 10px; background: #4CAF50; color: white; border: none; cursor: pointer;">Add Bookmark</button>
-  `;
-
-  const bookmarkList = document.createElement('div');
-  bookmarkList.style.flex = '1';
-  bookmarkList.style.overflow = 'auto';
-
-  const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
-
-  function renderBookmarks() {
-    bookmarkList.innerHTML = '';
-    bookmarks.forEach((bookmark, index) => {
-      const bookmarkElement = document.createElement('div');
-      bookmarkElement.style.display = 'flex';
-      bookmarkElement.style.justifyContent = 'space-between';
-      bookmarkElement.style.alignItems = 'center';
-      bookmarkElement.style.padding = '10px';
-      bookmarkElement.style.marginBottom = '5px';
-      bookmarkElement.style.background = 'rgba(255, 255, 255, 0.1)';
-      bookmarkElement.style.borderRadius = '5px';
-
-      bookmarkElement.innerHTML = `
-        <a href="${bookmark.url}" target="_blank" style="color: white; text-decoration: none;">${bookmark.title}</a>
-        <button onclick="deleteBookmark(${index})" style
-        <button onclick="deleteBookmark(${index})" style="padding: 5px 10px; background: #f44336; color: white; border: none; cursor: pointer;">Delete</button>
-      `;
-      bookmarkList.appendChild(bookmarkElement);
+  // Home Content
+  createTabContent('content1', (content) => {
+    const container = document.createElement('div');
+    Object.assign(container.style, {
+      animation: 'float 3s infinite ease-in-out',
+      marginTop: '40px'
     });
-  }
 
-  bookmarkForm.onsubmit = (e) => {
-    e.preventDefault();
-    const title = document.getElementById('bookmarkTitle').value;
-    const url = document.getElementById('bookmarkUrl').value;
+    const welcomeText = document.createElement('span');
+    welcomeText.id = 'welcomeText';
+    welcomeText.innerText = 'Welcome to Phoenix Hub!';
+    Object.assign(welcomeText.style, {
+      fontSize: '28px',
+      animation: 'neonGlow 2s infinite'
+    });
+    container.appendChild(welcomeText);
 
-    if (title && url) {
-      bookmarks.push({ title, url });
-      localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
-      renderBookmarks();
-      bookmarkForm.reset();
+    container.appendChild(document.createElement('br'));
+    container.appendChild(document.createElement('br'));
+    container.appendChild(document.createElement('br'));
+
+    const madeByText = document.createElement('span');
+    madeByText.innerText = 'Made by Ricky';
+    Object.assign(madeByText.style, {
+      fontSize: '24px',
+      animation: 'pulse 2s infinite'
+    });
+    container.appendChild(madeByText);
+
+    container.appendChild(document.createElement('br'));
+    container.appendChild(document.createElement('br'));
+    container.appendChild(document.createElement('br'));
+
+    const lastUpdated = document.createElement('div');
+    lastUpdated.innerText = 'Last Updated: January 17, 2024';
+    Object.assign(lastUpdated.style, {
+      position: 'absolute',
+      bottom: '10px',
+      width: '100%',
+      left: '0',
+      fontSize: '14px',
+      opacity: '0.8'
+    });
+    container.appendChild(lastUpdated);
+
+    content.appendChild(container);
+  });
+
+  // Features Content
+  createTabContent('content2', (content) => {
+    const container = document.createElement('div');
+    Object.assign(container.style, {
+      height: '100%',
+      padding: '20px'
+    });
+
+    const dropdownContainer = document.createElement('div');
+    Object.assign(dropdownContainer.style, {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(3, 1fr)',
+      gap: '20px',
+      width: '100%',
+      textAlign: 'center',
+      marginTop: '40px'
+    });
+
+    // Create Dropdowns
+    config.dropdowns.forEach((dropdownConfig) => {
+      const dropdown = createCustomDropdown(dropdownConfig);
+      dropdownContainer.appendChild(dropdown);
+    });
+
+    container.appendChild(dropdownContainer);
+    content.appendChild(container);
+  });
+
+  // Chat Content
+  createTabContent('content3', (content) => {
+    const iframe = document.createElement('iframe');
+    iframe.src = 'https://deadsimplechat.com/yNDNA0hhp';
+    iframe.width = '100%';
+    iframe.style.height = '600px';
+    iframe.style.border = 'none';
+    content.appendChild(iframe);
+  });
+
+  // AI Content
+  createTabContent('content4', (content) => {
+    const iframe = document.createElement('iframe');
+    iframe.src = 'https://www.blackbox.ai/';
+    iframe.width = '100%';
+    iframe.style.height = '600px';
+    iframe.style.border = 'none';
+    content.appendChild(iframe);
+  });
+
+  // Bookmarks Content
+  createTabContent('content5', (content) => {
+    Object.assign(content.style, {
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column'
+    });
+
+    const bookmarkContainer = document.createElement('div');
+    Object.assign(bookmarkContainer.style, {
+      padding: '10px',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '10px'
+    });
+
+    const bookmarkForm = document.createElement('form');
+    bookmarkForm.style.display = 'flex';
+    bookmarkForm.style.alignItems = 'center';
+    bookmarkForm.style.gap = '5px';
+
+    const bookmarkTitleInput = document.createElement('input');
+    bookmarkTitleInput.type = 'text';
+    bookmarkTitleInput.id = 'bookmarkTitle';
+    bookmarkTitleInput.placeholder = 'Title';
+    Object.assign(bookmarkTitleInput.style, {
+      padding: '5px',
+      flex: '1'
+    });
+
+    const bookmarkUrlInput = document.createElement('input');
+    bookmarkUrlInput.type = 'url';
+    bookmarkUrlInput.id = 'bookmarkUrl';
+    bookmarkUrlInput.placeholder = 'URL';
+    Object.assign(bookmarkUrlInput.style, {
+      padding: '5px',
+      flex: '2'
+    });
+
+    const addButton = document.createElement('button');
+    addButton.type = 'submit';
+    addButton.innerText = 'Add Bookmark';
+    Object.assign(addButton.style, {
+      padding: '5px 10px',
+      background: '#4CAF50',
+      color: 'white',
+      border: 'none',
+      cursor: 'pointer'
+    });
+
+    bookmarkForm.appendChild(bookmarkTitleInput);
+    bookmarkForm.appendChild(bookmarkUrlInput);
+    bookmarkForm.appendChild(addButton);
+
+    const bookmarkList = document.createElement('div');
+    Object.assign(bookmarkList.style, {
+      flex: '1',
+      overflow: 'auto'
+    });
+
+    let bookmarks = [];
+    try {
+      bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+    } catch (e) {
+      console.error('Error reading bookmarks from localStorage:', e);
     }
-  };
 
-  window.deleteBookmark = (index) => {
-    bookmarks.splice(index, 1);
-    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    function renderBookmarks() {
+      bookmarkList.innerHTML = '';
+      bookmarks.forEach((bookmark, index) => {
+        const bookmarkElement = document.createElement('div');
+        Object.assign(bookmarkElement.style, {
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '10px',
+          marginBottom: '5px',
+          background: 'rgba(255, 255, 255, 0.1)',
+          borderRadius: '5px'
+        });
+
+        const link = document.createElement('a');
+        link.href = bookmark.url;
+        link.target = '_blank';
+        link.innerText = bookmark.title;
+        Object.assign(link.style, {
+          color: 'white',
+          textDecoration: 'none'
+        });
+
+        const deleteButton = document.createElement('button');
+        deleteButton.innerText = 'Delete';
+        Object.assign(deleteButton.style, {
+          padding: '5px 10px',
+          background: '#f44336',
+          color: 'white',
+          border: 'none',
+          cursor: 'pointer'
+        });
+        deleteButton.addEventListener('click', () => {
+          if (confirm('Are you sure you want to delete this bookmark?')) {
+            deleteBookmark(index);
+          }
+        });
+
+        bookmarkElement.appendChild(link);
+        bookmarkElement.appendChild(deleteButton);
+        bookmarkList.appendChild(bookmarkElement);
+      });
+    }
+
+    bookmarkForm.onsubmit = (e) => {
+      e.preventDefault();
+      const title = bookmarkTitleInput.value.trim();
+      const url = bookmarkUrlInput.value.trim();
+
+      if (title && url) {
+        bookmarks.push({ title, url });
+        try {
+          localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+          renderBookmarks();
+          bookmarkForm.reset();
+          alert('Bookmark added successfully!');
+        } catch (e) {
+          console.error('Error saving bookmark:', e);
+          alert('Failed to save bookmark.');
+        }
+      }
+    };
+
+    function deleteBookmark(index) {
+      bookmarks.splice(index, 1);
+      try {
+        localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+        renderBookmarks();
+        alert('Bookmark deleted.');
+      } catch (e) {
+        console.error('Error deleting bookmark:', e);
+        alert('Failed to delete bookmark.');
+      }
+    }
+
+    bookmarkContainer.appendChild(bookmarkForm);
+    bookmarkContainer.appendChild(bookmarkList);
+    content.appendChild(bookmarkContainer);
+
     renderBookmarks();
-  };
+  });
 
-  bookmarkContainer.appendChild(bookmarkForm);
-  bookmarkContainer.appendChild(bookmarkList);
-  content5.appendChild(bookmarkContainer);
-
-  renderBookmarks();
-
+  // Close and Minimize Buttons
   const closeButton = document.createElement('button');
   closeButton.innerText = '×';
-  closeButton.style.position = 'absolute';
-  closeButton.style.top = '8px';
-  closeButton.style.right = '10px';
-  closeButton.style.width = '30px';
-  closeButton.style.height = '30px';
-  closeButton.style.border = 'none';
-  closeButton.style.background = 'red';
-  closeButton.style.color = 'white';
-  closeButton.style.fontSize = '20px';
-  closeButton.style.cursor = 'pointer';
+  Object.assign(closeButton.style, {
+    position: 'absolute',
+    top: '8px',
+    right: '10px',
+    width: '30px',
+    height: '30px',
+    border: 'none',
+    background: 'red',
+    color: 'white',
+    fontSize: '20px',
+    cursor: 'pointer'
+  });
   closeButton.classList.add('button-glow');
   closeButton.addEventListener('click', () => {
     rgbContainer.remove();
+    // Clean up event listeners
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
   });
   rgbContainer.appendChild(closeButton);
 
   const minimizeButton = document.createElement('button');
   minimizeButton.innerText = '−';
-  minimizeButton.style.position = 'absolute';
-  minimizeButton.style.top = '8px';
-  minimizeButton.style.right = '50px';
-  minimizeButton.style.width = '30px';
-  minimizeButton.style.height = '30px';
-  minimizeButton.style.border = 'none';
-  minimizeButton.style.background = 'gray';
-  minimizeButton.style.color = 'white';
-  minimizeButton.style.fontSize = '20px';
-  minimizeButton.style.cursor = 'pointer';
+  Object.assign(minimizeButton.style, {
+    position: 'absolute',
+    top: '8px',
+    right: '50px',
+    width: '30px',
+    height: '30px',
+    border: 'none',
+    background: 'gray',
+    color: 'white',
+    fontSize: '20px',
+    cursor: 'pointer'
+  });
   minimizeButton.classList.add('button-glow');
   minimizeButton.addEventListener('click', () => {
-    rgbContainer.style.height = rgbContainer.style.height === '30px' ? '400px' : '30px';
+    if (rgbContainer.style.height === '30px') {
+      rgbContainer.style.height = '400px';
+    } else {
+      rgbContainer.style.height = '30px';
+    }
   });
   rgbContainer.appendChild(minimizeButton);
 
-  // Add the dropdown styles
+  // Dropdown Styles
   const dropdownStyles = document.createElement('style');
   dropdownStyles.textContent = `
     .custom-dropdown {
       position: relative;
       display: inline-block;
     }
-
     .dropdown-btn {
       background: linear-gradient(45deg, #2b2b2b, #1a1a1a);
       color: #fff;
@@ -389,13 +593,11 @@
       box-shadow: 0 0 10px rgba(0,255,0,0.2);
       width: 80%;
     }
-
     .dropdown-btn:hover {
       background: linear-gradient(45deg, #3b3b3b, #2a2a2a);
       transform: translateY(-2px);
       box-shadow: 0 0 15px rgba(0,255,0,0.4);
     }
-
     .dropdown-content {
       display: none;
       position: absolute;
@@ -411,12 +613,10 @@
       left: 50%;
       transform: translateX(-50%);
     }
-
     .custom-dropdown:hover .dropdown-content {
       display: block;
       animation: dropdownFade 0.3s ease;
     }
-
     .dropdown-content a {
       color: white;
       padding: 12px 16px;
@@ -424,12 +624,10 @@
       display: block;
       transition: all 0.2s ease;
     }
-
     .dropdown-content a:hover {
       background: rgba(0,255,0,0.1);
       padding-left: 22px;
     }
-
     @keyframes dropdownFade {
       from {
         opacity: 0;
@@ -443,32 +641,67 @@
   `;
   document.head.appendChild(dropdownStyles);
 
-  // Theme switching functionality
-  window.setTheme = (theme) => {
-    const container = document.getElementById('rgbContainer');
-    switch(theme) {
-      case 'neon':
-        container.style.background = 'linear-gradient(45deg, #000000, #1a1a1a)';
-        container.style.boxShadow = '0 0 20px #00ff00';
-        break;
-      case 'dark':
-        container.style.background = 'linear-gradient(45deg, #1a1a1a, #2d2d2d)';
-        container.style.boxShadow = '0 0 20px rgba(255,255,255,0.2)';
-        break;
-      case 'cyber':
-        container.style.background = 'linear-gradient(45deg, #000428, #004e92)';
-        container.style.boxShadow = '0 0 20px #00ffff';
-        break;
-      case 'retro':
-        container.style.background = 'linear-gradient(45deg, #2b0537, #760a5e)';
-        container.style.boxShadow = '0 0 20px #ff00ff';
-        break;
-      case 'minimal':
-        container.style.background = '#1a1a1a';
-        container.style.boxShadow = '0 0 10px rgba(255,255,255,0.1)';
-        break;
-    }
-  };
+  // Create Custom Dropdown
+  function createCustomDropdown(dropdownConfig) {
+    const dropdown = document.createElement('div');
+    dropdown.className = 'custom-dropdown';
 
+    const button = document.createElement('button');
+    button.className = 'dropdown-btn';
+    button.innerText = dropdownConfig.label;
+
+    const content = document.createElement('div');
+    content.className = 'dropdown-content';
+
+    dropdownConfig.items.forEach((item) => {
+      const link = document.createElement('a');
+      link.innerText = item.title;
+      if (item.url) {
+        link.href = item.url;
+        link.target = '_blank';
+      } else if (item.theme) {
+        link.href = '#';
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          setTheme(item.theme);
+        });
+      }
+      content.appendChild(link);
+    });
+
+    dropdown.appendChild(button);
+    dropdown.appendChild(content);
+
+    return dropdown;
+  }
+
+  // Theme Switching Functionality
+  function setTheme(themeName) {
+    const theme = config.themes[themeName];
+    if (theme) {
+      rgbContainer.style.background = theme.background;
+      rgbContainer.style.boxShadow = theme.boxShadow;
+      try {
+        localStorage.setItem('phoenixHubTheme', themeName);
+      } catch (e) {
+        console.error('Error saving theme to localStorage:', e);
+      }
+    }
+  }
+
+  // Apply Saved Theme
+  function applySavedTheme() {
+    let savedTheme = 'neon';
+    try {
+      savedTheme = localStorage.getItem('phoenixHubTheme') || 'neon';
+    } catch (e) {
+      console.error('Error reading theme from localStorage:', e);
+    }
+    setTheme(savedTheme);
+  }
+
+  applySavedTheme();
+
+  // Initialize Default Tab
   document.querySelector('[data-content="content1"]').click();
 })();
