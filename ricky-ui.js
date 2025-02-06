@@ -1,4 +1,10 @@
 (function() {
+  // Create a Trusted Types policy if available.
+  const trustedHTMLPolicy = window.trustedTypes
+    ? trustedTypes.createPolicy('default', { createHTML: (input) => input })
+    : null;
+  const safeHTML = (html) => trustedHTMLPolicy ? trustedHTMLPolicy.createHTML(html) : html;
+
   // Check if the hub is already loaded
   if (document.querySelector('#rgbContainer')) return;
 
@@ -72,7 +78,7 @@
             { title: 'Discord', url: 'https://discord.com' },
             { title: 'Twitter', url: 'https://twitter.com' },
             { title: 'Pinterest', url: 'https://www.pinterest.com' },
-            { title: 'Spotify', url: 'https://open.spotify.com' } // New addition
+            { title: 'Spotify', url: 'https://open.spotify.com' }
           ]
         },
         {
@@ -537,7 +543,8 @@
       }
 
       function renderBookmarks() {
-        bookmarkList.innerHTML = '';
+        // Use safeHTML when clearing innerHTML
+        bookmarkList.innerHTML = safeHTML('');
         bookmarks.forEach((bookmark, index) => {
           const bookmarkElement = document.createElement('div');
           Object.assign(bookmarkElement.style, {
@@ -804,8 +811,8 @@
     // If an error occurs, display an error message on the loading screen
     console.error('Error initializing Phoenix Hub:', error);
 
-    // Clear any existing loading content
-    loadingOverlay.innerHTML = '';
+    // Clear any existing loading content using safeHTML
+    loadingOverlay.innerHTML = safeHTML('');
 
     // Display error message
     const errorMessage = document.createElement('div');
