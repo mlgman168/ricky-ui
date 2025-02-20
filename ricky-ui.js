@@ -57,7 +57,6 @@
   loadingOverlay.appendChild(spinner);
   document.body.appendChild(loadingOverlay);
 
-  // Main Script Execution
   try {
     // Configuration Objects
     const config = {
@@ -66,7 +65,8 @@
         { label: 'Features', contentId: 'content2' },
         { label: 'Chat', contentId: 'content3' },
         { label: 'AI', contentId: 'content4' },
-        { label: 'Bookmarks', contentId: 'content5' }
+        { label: 'Bookmarks', contentId: 'content5' },
+        { label: 'Keybinds', contentId: 'content6' } // New Keybinds tab
       ],
       dropdowns: [
         {
@@ -163,6 +163,31 @@
         }
       }
     };
+
+    // Default Key Bindings and Load Saved Bindings (if any)
+    const defaultKeyBindings = {
+      toggleHub: 'KeyH',       // Toggle the hub’s visibility
+      homeTab: 'Digit1',       // Switch to Home tab
+      featuresTab: 'Digit2',   // Switch to Features tab
+      chatTab: 'Digit3',       // Switch to Chat tab
+      aiTab: 'Digit4',         // Switch to AI tab
+      bookmarksTab: 'Digit5',  // Switch to Bookmarks tab
+      keybindsTab: 'Digit6'    // Switch to Keybinds tab
+    };
+    let keyBindings = {};
+    try {
+      keyBindings = JSON.parse(localStorage.getItem('phoenixHubKeyBindings')) || defaultKeyBindings;
+    } catch (e) {
+      console.error('Error reading keybindings:', e);
+      keyBindings = defaultKeyBindings;
+    }
+    function saveKeyBindings() {
+      try {
+        localStorage.setItem('phoenixHubKeyBindings', JSON.stringify(keyBindings));
+      } catch (e) {
+        console.error('Error saving keybindings:', e);
+      }
+    }
 
     // Stylesheet Injection
     const styleSheet = document.createElement('style');
@@ -412,7 +437,7 @@
       container.appendChild(document.createElement('br'));
 
       const lastUpdated = document.createElement('div');
-      lastUpdated.innerText = 'Last Updated: November 11, 2024';
+      lastUpdated.innerText = 'Last Updated: February 20, 2025';
       Object.assign(lastUpdated.style, {
         position: 'absolute',
         bottom: '10px',
@@ -543,7 +568,6 @@
       }
 
       function renderBookmarks() {
-        // Use safeHTML when clearing innerHTML
         bookmarkList.innerHTML = safeHTML('');
         bookmarks.forEach((bookmark, index) => {
           const bookmarkElement = document.createElement('div');
@@ -625,6 +649,60 @@
       renderBookmarks();
     });
 
+    // Keybinds Content (New Tab)
+    createTabContent('content6', (content) => {
+      const container = document.createElement('div');
+      Object.assign(container.style, {
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px'
+      });
+
+      const instructions = document.createElement('div');
+      instructions.innerText = 'Click on a key binding to change it. Then press the new key.';
+      container.appendChild(instructions);
+
+      Object.keys(keyBindings).forEach((action) => {
+        const row = document.createElement('div');
+        Object.assign(row.style, {
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '5px',
+          border: '1px solid white',
+          borderRadius: '5px'
+        });
+
+        const label = document.createElement('span');
+        label.innerText = action;
+        row.appendChild(label);
+
+        const keySpan = document.createElement('span');
+        keySpan.innerText = keyBindings[action];
+        keySpan.style.cursor = 'pointer';
+        keySpan.style.padding = '5px';
+        keySpan.style.background = 'rgba(255, 255, 255, 0.1)';
+        keySpan.style.borderRadius = '3px';
+        row.appendChild(keySpan);
+
+        keySpan.addEventListener('click', () => {
+          keySpan.innerText = 'Press new key...';
+          const onKeyPress = (e) => {
+            keyBindings[action] = e.code;
+            keySpan.innerText = e.code;
+            saveKeyBindings();
+            document.removeEventListener('keydown', onKeyPress);
+          };
+          document.addEventListener('keydown', onKeyPress);
+        });
+
+        container.appendChild(row);
+      });
+
+      content.appendChild(container);
+    });
+
     // Close and Minimize Buttons
     const closeButton = document.createElement('button');
     closeButton.innerText = '×';
@@ -642,10 +720,8 @@
     });
     closeButton.classList.add('button-glow');
     closeButton.addEventListener('click', () => {
-      rgbContainer.remove();
-      // Clean up event listeners
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
+      // Instead of removing, we hide the hub so it can be toggled back with the keybind
+      rgbContainer.style.display = 'none';
     });
     rgbContainer.appendChild(closeButton);
 
@@ -801,6 +877,33 @@
 
     applySavedTheme();
 
+    // Global Keydown Listener for Key Bindings
+    document.addEventListener('keydown', (e) => {
+      // Prevent interfering when typing in inputs
+      if (document.activeElement.tagName === 'INPUT') return;
+      if (e.code === keyBindings.toggleHub) {
+        rgbContainer.style.display = rgbContainer.style.display === 'none' ? 'block' : 'none';
+      }
+      if (e.code === keyBindings.homeTab) {
+        document.querySelector('[data-content="content1"]').click();
+      }
+      if (e.code === keyBindings.featuresTab) {
+        document.querySelector('[data-content="content2"]').click();
+      }
+      if (e.code === keyBindings.chatTab) {
+        document.querySelector('[data-content="content3"]').click();
+      }
+      if (e.code === keyBindings.aiTab) {
+        document.querySelector('[data-content="content4"]').click();
+      }
+      if (e.code === keyBindings.bookmarksTab) {
+        document.querySelector('[data-content="content5"]').click();
+      }
+      if (e.code === keyBindings.keybindsTab) {
+        document.querySelector('[data-content="content6"]').click();
+      }
+    });
+
     // Initialize Default Tab
     document.querySelector('[data-content="content1"]').click();
 
@@ -808,13 +911,8 @@
     loadingOverlay.remove();
 
   } catch (error) {
-    // If an error occurs, display an error message on the loading screen
     console.error('Error initializing Phoenix Hub:', error);
-
-    // Clear any existing loading content using safeHTML
     loadingOverlay.innerHTML = safeHTML('');
-
-    // Display error message
     const errorMessage = document.createElement('div');
     errorMessage.innerText = 'An error occurred while loading Phoenix Hub.';
     Object.assign(errorMessage.style, {
@@ -822,14 +920,12 @@
       marginBottom: '20px',
       color: '#ff4c4c'
     });
-
     const errorDetails = document.createElement('div');
     errorDetails.innerText = error.message || 'Unknown error.';
     Object.assign(errorDetails.style, {
       fontSize: '18px',
       color: '#fff'
     });
-
     loadingOverlay.appendChild(errorMessage);
     loadingOverlay.appendChild(errorDetails);
   }
