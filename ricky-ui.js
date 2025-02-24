@@ -1,8 +1,16 @@
 (function() {
-  // Create a Trusted Types policy if available.
-  const trustedHTMLPolicy = window.trustedTypes
-    ? trustedTypes.createPolicy('default', { createHTML: (input) => input })
-    : null;
+  // Use a global variable to store the policy so it's only created once.
+  if (!window.__trustedHTMLPolicy__ && window.trustedTypes) {
+    try {
+      window.__trustedHTMLPolicy__ = trustedTypes.createPolicy('default', {
+        createHTML: (input) => input
+      });
+    } catch (e) {
+      // If creation fails (policy already exists), we can safely ignore it.
+      console.warn("Trusted Types policy 'default' already exists.");
+    }
+  }
+  const trustedHTMLPolicy = window.__trustedHTMLPolicy__ || null;
   const safeHTML = (html) => trustedHTMLPolicy ? trustedHTMLPolicy.createHTML(html) : html;
 
   // Check if the hub is already loaded
@@ -165,6 +173,7 @@
     };
 
     // Default Key Bindings and Load Saved Bindings (if any)
+    // Note: A new key binding "destroyUI" (default: 'AltRight') has been added.
     const defaultKeyBindings = {
       toggleHub: 'KeyH',       // Toggle the hub’s visibility
       homeTab: 'Digit1',       // Switch to Home tab
@@ -172,7 +181,8 @@
       chatTab: 'Digit3',       // Switch to Chat tab
       aiTab: 'Digit4',         // Switch to AI tab
       bookmarksTab: 'Digit5',  // Switch to Bookmarks tab
-      keybindsTab: 'Digit6'    // Switch to Keybinds tab
+      keybindsTab: 'Digit6',   // Switch to Keybinds tab
+      destroyUI: 'AltRight'    // Destroy the UI completely (Right Alt)
     };
     let keyBindings = {};
     try {
@@ -437,7 +447,7 @@
       container.appendChild(document.createElement('br'));
 
       const lastUpdated = document.createElement('div');
-      lastUpdated.innerText = 'Last Updated: February 20, 2025';
+      lastUpdated.innerText = 'Last Updated: February 24, 2025';
       Object.assign(lastUpdated.style, {
         position: 'absolute',
         bottom: '10px',
@@ -781,7 +791,7 @@
         box-shadow: 0 0 15px rgba(0,255,0,0.3);
         border-radius: 8px;
         padding: 8px 0;
-        z-index: 1;
+        z-index: 1,
         backdrop-filter: blur(5px);
         transform: translateY(10px);
         transition: all 0.3s ease;
@@ -901,6 +911,10 @@
       }
       if (e.code === keyBindings.keybindsTab) {
         document.querySelector('[data-content="content6"]').click();
+      }
+      // New key binding: destroy the UI completely
+      if (e.code === keyBindings.destroyUI) {
+        rgbContainer.remove();
       }
     });
 
