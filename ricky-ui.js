@@ -74,7 +74,8 @@
         { label: 'Chat', contentId: 'content3' },
         { label: 'AI', contentId: 'content4' },
         { label: 'Bookmarks', contentId: 'content5' },
-        { label: 'Keybinds', contentId: 'content6' } // New Keybinds tab
+        { label: 'Websites', contentId: 'content6' }, // New Websites tab
+        { label: 'Keybinds', contentId: 'content7' }  // Renumbered Keybinds tab
       ],
       dropdowns: [
         {
@@ -173,7 +174,7 @@
     };
 
     // Default Key Bindings and Load Saved Bindings (if any)
-    // Note: A new key binding "destroyUI" (default: 'AltRight') has been added.
+    // Updated to include the new websites tab
     const defaultKeyBindings = {
       toggleHub: 'KeyH',       // Toggle the hub’s visibility
       homeTab: 'Digit1',       // Switch to Home tab
@@ -181,7 +182,8 @@
       chatTab: 'Digit3',       // Switch to Chat tab
       aiTab: 'Digit4',         // Switch to AI tab
       bookmarksTab: 'Digit5',  // Switch to Bookmarks tab
-      keybindsTab: 'Digit6',   // Switch to Keybinds tab
+      websitesTab: 'Digit6',   // Switch to Websites tab
+      keybindsTab: 'Digit7',   // Switch to Keybinds tab
       destroyUI: 'AltRight'    // Destroy the UI completely (Right Alt)
     };
     let keyBindings = {};
@@ -659,8 +661,57 @@
       renderBookmarks();
     });
 
-    // Keybinds Content (New Tab)
+    // Websites Content (New Tab)
     createTabContent('content6', (content) => {
+      const container = document.createElement('div');
+      Object.assign(container.style, {
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px',
+        alignItems: 'center'
+      });
+      
+      const info = document.createElement('div');
+      info.innerText = 'Visit one of these websites:';
+      info.style.fontSize = '18px';
+      container.appendChild(info);
+      
+      // First Website Link
+      const link1 = document.createElement('a');
+      link1.href = 'https://www.exploitsnstuff.org/';
+      link1.target = '_blank';
+      link1.innerText = 'Exploits n Stuff';
+      Object.assign(link1.style, {
+        color: 'cyan',
+        fontSize: '16px',
+        textDecoration: 'none',
+        border: '1px solid cyan',
+        padding: '10px 20px',
+        borderRadius: '5px'
+      });
+      container.appendChild(link1);
+      
+      // Second Website Link
+      const link2 = document.createElement('a');
+      link2.href = 'https://sites.google.com/view/exploitsnstuff2';
+      link2.target = '_blank';
+      link2.innerText = 'Exploits n Stuff 2';
+      Object.assign(link2.style, {
+        color: 'cyan',
+        fontSize: '16px',
+        textDecoration: 'none',
+        border: '1px solid cyan',
+        padding: '10px 20px',
+        borderRadius: '5px'
+      });
+      container.appendChild(link2);
+      
+      content.appendChild(container);
+    });
+
+    // Keybinds Content (Renumbered to content7)
+    createTabContent('content7', (content) => {
       const container = document.createElement('div');
       Object.assign(container.style, {
         padding: '20px',
@@ -909,8 +960,11 @@
       if (e.code === keyBindings.bookmarksTab) {
         document.querySelector('[data-content="content5"]').click();
       }
-      if (e.code === keyBindings.keybindsTab) {
+      if (e.code === keyBindings.websitesTab) {
         document.querySelector('[data-content="content6"]').click();
+      }
+      if (e.code === keyBindings.keybindsTab) {
+        document.querySelector('[data-content="content7"]').click();
       }
       // New key binding: destroy the UI completely
       if (e.code === keyBindings.destroyUI) {
@@ -944,3 +998,5 @@
     loadingOverlay.appendChild(errorDetails);
   }
 })();
+
+
