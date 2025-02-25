@@ -444,17 +444,51 @@
       });
       container.appendChild(madeByText);
 
+      // Insert the copy button immediately under "Made by Ricky"
       container.appendChild(document.createElement('br'));
+      container.appendChild(document.createElement('br'));
+
+      const copyButton = document.createElement('button');
+      copyButton.innerText = "Click for new UI";
+      Object.assign(copyButton.style, {
+          padding: '10px 20px',
+          fontSize: '16px',
+          margin: '20px',
+          cursor: 'pointer',
+          background: 'linear-gradient(45deg, #2b2b2b, #1a1a1a)',
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          boxShadow: '0 0 10px rgba(0,255,0,0.2)',
+          transition: 'all 0.3s ease'
+      });
+      copyButton.addEventListener('mouseover', () => {
+          copyButton.style.transform = 'scale(1.05)';
+      });
+      copyButton.addEventListener('mouseout', () => {
+          copyButton.style.transform = 'scale(1)';
+      });
+      copyButton.addEventListener('click', () => {
+        const snippet = "javascript:(function(){  fetch('https://raw.githubusercontent.com/mlgman168/ricky-ui/refs/heads/main/ricky-ui.js?%27 + new Date().getTime())    .then(function(response){ return response.text(); })    .then(function(code){      var blob = new Blob([code], {type: %27application/javascript%27});      var blobUrl = URL.createObjectURL(blob);      var script = document.createElement(%27script%27);      if(window.trustedTypes) {        var policy;        if(window.__phoenixHubPolicy){          policy = window.__phoenixHubPolicy;        } else {          policy = window.trustedTypes.createPolicy(%27phoenixHubPolicy%27, {            createScriptURL: function(url) { return url; }          });          window.__phoenixHubPolicy = policy;        }        script.src = policy.createScriptURL(blobUrl);      } else {        script.src = blobUrl;      }      script.onload = function(){        URL.revokeObjectURL(blobUrl);      };      document.body.appendChild(script);    })    .catch(function(err){      console.error(%27Error loading ricky-ui.js:%27, err);    });})();";
+        navigator.clipboard.writeText(snippet).then(() => {
+          const originalText = copyButton.innerText;
+          copyButton.innerText = "Copied!";
+          setTimeout(() => {
+            copyButton.innerText = originalText;
+          }, 2000);
+        }).catch(err => {
+          console.error("Failed to copy text:", err);
+        });
+      });
+      container.appendChild(copyButton);
+
+      // Move the "Last Updated" text down (without absolute positioning)
       container.appendChild(document.createElement('br'));
       container.appendChild(document.createElement('br'));
 
       const lastUpdated = document.createElement('div');
-      lastUpdated.innerText = 'Last Updated: February 24, 2025';
+      lastUpdated.innerText = 'Last Updated: February 25, 2025';
       Object.assign(lastUpdated.style, {
-        position: 'absolute',
-        bottom: '10px',
-        width: '100%',
-        left: '0',
         fontSize: '14px',
         opacity: '0.8'
       });
@@ -998,5 +1032,3 @@
     loadingOverlay.appendChild(errorDetails);
   }
 })();
-
-
