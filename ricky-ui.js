@@ -487,7 +487,7 @@
       container.appendChild(document.createElement('br'));
 
       const lastUpdated = document.createElement('div');
-      lastUpdated.innerText = 'Last Updated: February 25, 2025';
+      lastUpdated.innerText = 'Last Updated: March 5, 2025';
       Object.assign(lastUpdated.style, {
         fontSize: '14px',
         opacity: '0.8'
