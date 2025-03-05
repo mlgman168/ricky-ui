@@ -174,7 +174,6 @@
     };
 
     // Default Key Bindings and Load Saved Bindings (if any)
-    // Updated to include the new websites tab
     const defaultKeyBindings = {
       toggleHub: 'KeyH',       // Toggle the hub’s visibility
       homeTab: 'Digit1',       // Switch to Home tab
@@ -309,8 +308,9 @@
       topBar.style.cursor = 'grab';
     };
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    // Use capturing phase (true) for these event listeners so they fire before Google Docs/Form listeners.
+    document.addEventListener('mousemove', onMouseMove, true);
+    document.addEventListener('mouseup', onMouseUp, true);
 
     // Title
     const title = document.createElement('h2');
@@ -787,9 +787,9 @@
             keyBindings[action] = e.code;
             keySpan.innerText = e.code;
             saveKeyBindings();
-            document.removeEventListener('keydown', onKeyPress);
+            document.removeEventListener('keydown', onKeyPress, true);
           };
-          document.addEventListener('keydown', onKeyPress);
+          document.addEventListener('keydown', onKeyPress, true);
         });
 
         container.appendChild(row);
@@ -972,10 +972,12 @@
 
     applySavedTheme();
 
-    // Global Keydown Listener for Key Bindings
+    // Global Keydown Listener for Key Bindings (using capturing phase)
     document.addEventListener('keydown', (e) => {
-      // Prevent interfering when typing in inputs
-      if (document.activeElement.tagName === 'INPUT') return;
+      // Avoid interfering when typing in inputs, textareas, or contenteditable elements
+      const active = document.activeElement;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
+
       if (e.code === keyBindings.toggleHub) {
         rgbContainer.style.display = rgbContainer.style.display === 'none' ? 'block' : 'none';
       }
@@ -1004,7 +1006,7 @@
       if (e.code === keyBindings.destroyUI) {
         rgbContainer.remove();
       }
-    });
+    }, true);
 
     // Initialize Default Tab
     document.querySelector('[data-content="content1"]').click();
